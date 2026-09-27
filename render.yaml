@@ -1,0 +1,29 @@
+# Render Blueprint: render.com → New → Blueprint → выбрать этот репозиторий.
+# Значения с sync: false Render спросит при создании (их нет в репозитории).
+services:
+  - type: web
+    name: umniki
+    runtime: python
+    plan: free
+    region: frankfurt
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --app-dir backend
+    healthCheckPath: /api/courses
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      # Строка подключения к PostgreSQL из Neon (postgresql://...)
+      - key: DATABASE_URL
+        sync: false
+      # Администратор создаётся при первом запуске; пароль — не короче 12 символов
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      # Сайт работает по HTTPS — cookie входа только через защищённое соединение
+      - key: COOKIE_SECURE
+        value: "1"
+      # На пустой базе загрузить демо-курсы
+      - key: SEED_DEMO_CONTENT
+        value: "1"
